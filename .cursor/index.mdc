@@ -1,0 +1,32 @@
+# Basketball Sim — Frontend (Next.js + Tailwind + PixiJS)
+
+> **TL;DR:** This repo is the **browser UI** for our college basketball RTS/sim.
+>
+> - **Map view:** PixiJS renders an interactive US map with traveling assistant coaches.
+> - **UI shell:** Next.js (React, TypeScript, Tailwind).
+> - **Realtime:** WebSocket to backend (Django/Channels). Server is authoritative; client is a renderer + command sender.
+> - **State:** Zustand for client state; server diffs over WS hydrate/patch.
+
+---
+
+## Tech Stack
+
+- **Framework:** Next.js (App Router), React 18, TypeScript
+- **Styling:** Tailwind CSS + CSS variables; shadcn/ui (Radix primitives) for controls
+- **Canvas:** PixiJS for the map/RTS layer
+- **State:** Zustand (lightweight store) + React Query (for REST)
+- **Data:**
+  - WebSocket (Channels) for `STATE_DIFF`/events and command acks
+  - REST/GraphQL (TBD) for non-realtime pages (roster, budgets, settings)
+- **Lint/Format:** ESLint, Prettier, Husky + lint-staged
+- **Testing:** Vitest + React Testing Library, Playwright (e2e)
+- **CI/CD:** (configure per repo; default GitHub Actions)
+
+---
+
+## How to Run
+
+```bash
+npm i
+npm dev
+```
