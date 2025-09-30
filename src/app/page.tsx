@@ -24,40 +24,67 @@ interface League {
 	teams: Team[];
 }
 
+type SortField =
+	| 'overall'
+	| 'potential'
+	| 'name'
+	| 'state'
+	| 'position'
+	| 'stars';
+type SortOrder = 'asc' | 'desc';
+
 export default function Home() {
 	const [leagues, setLeagues] = useState<League[]>([]);
 	const [players, setPlayers] = useState<Player[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
+	const [sortField, setSortField] = useState<SortField>('overall');
+	const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
+
+	const fetchData = async () => {
+		try {
+			// Fetch leagues and teams
+			const leaguesResponse = await fetch(
+				'http://localhost:8000/league/leagues/'
+			);
+			if (!leaguesResponse.ok) throw new Error('Failed to fetch leagues');
+			const leaguesData = await leaguesResponse.json();
+			setLeagues(leaguesData);
+
+			// Fetch players with sorting
+			const playersResponse = await fetch(
+				`http://localhost:8000/players/all/?sort_by=${sortField}&sort_order=${sortOrder}`
+			);
+			if (!playersResponse.ok) throw new Error('Failed to fetch players');
+			const playersData = await playersResponse.json();
+			setPlayers(playersData);
+
+			setLoading(false);
+		} catch (err) {
+			setError(err instanceof Error ? err.message : 'An error occurred');
+			setLoading(false);
+		}
+	};
 
 	useEffect(() => {
-		const fetchData = async () => {
-			try {
-				// Fetch leagues and teams
-				const leaguesResponse = await fetch(
-					'http://localhost:8000/league/leagues/'
-				);
-				if (!leaguesResponse.ok) throw new Error('Failed to fetch leagues');
-				const leaguesData = await leaguesResponse.json();
-				setLeagues(leaguesData);
-
-				// Fetch all players
-				const playersResponse = await fetch(
-					'http://localhost:8000/players/all/'
-				);
-				if (!playersResponse.ok) throw new Error('Failed to fetch players');
-				const playersData = await playersResponse.json();
-				setPlayers(playersData);
-
-				setLoading(false);
-			} catch (err) {
-				setError(err instanceof Error ? err.message : 'An error occurred');
-				setLoading(false);
-			}
-		};
-
 		fetchData();
-	}, []);
+	}, [sortField, sortOrder]);
+
+	const handleSort = (field: SortField) => {
+		if (sortField === field) {
+			// Toggle sort order if same field
+			setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+		} else {
+			// New field, default to descending
+			setSortField(field);
+			setSortOrder('desc');
+		}
+	};
+
+	const getSortIcon = (field: SortField) => {
+		if (sortField !== field) return '↕️';
+		return sortOrder === 'asc' ? '↑' : '↓';
+	};
 
 	if (loading) {
 		return (
@@ -133,9 +160,14 @@ export default function Home() {
 
 				{/* Players Section */}
 				<section>
-					<h2 className='text-2xl font-semibold mb-4 text-gray-800'>
-						Top Recruits
-					</h2>
+					<div className='flex justify-between items-center mb-4'>
+						<h2 className='text-2xl font-semibold text-gray-800'>
+							Top Recruits
+						</h2>
+						<div className='text-sm text-gray-600'>
+							Sorted by: {sortField} ({sortOrder})
+						</div>
+					</div>
 					{players.length === 0 ? (
 						<p className='text-gray-600'>
 							No players found. Generate a recruiting class to get started!
@@ -149,20 +181,30 @@ export default function Home() {
 											<th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
 												Rank
 											</th>
-											<th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-												Name
+											<th
+												className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-200'
+												onClick={() => handleSort('name')}>
+												Name {getSortIcon('name')}
 											</th>
-											<th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-												Position
+											<th
+												className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-200'
+												onClick={() => handleSort('position')}>
+												Position {getSortIcon('position')}
 											</th>
-											<th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-												State
+											<th
+												className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-200'
+												onClick={() => handleSort('state')}>
+												State {getSortIcon('state')}
 											</th>
-											<th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-												Overall
+											<th
+												className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-200'
+												onClick={() => handleSort('overall')}>
+												Overall {getSortIcon('overall')}
 											</th>
-											<th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-												Stars
+											<th
+												className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-200'
+												onClick={() => handleSort('stars')}>
+												Stars {getSortIcon('stars')}
 											</th>
 										</tr>
 									</thead>
