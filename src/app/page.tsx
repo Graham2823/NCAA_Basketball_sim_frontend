@@ -51,13 +51,26 @@ export default function Home() {
 			const leaguesData = await leaguesResponse.json();
 			setLeagues(leaguesData);
 
-			// Fetch players with sorting
-			const playersResponse = await fetch(
-				`http://localhost:8000/players/all/?sort_by=${sortField}&sort_order=${sortOrder}`
+			// Fetch recruiting classes and get the first one
+			const recruitingClassesResponse = await fetch(
+				'http://localhost:8000/players/recruiting-classes/'
 			);
-			if (!playersResponse.ok) throw new Error('Failed to fetch players');
-			const playersData = await playersResponse.json();
-			setPlayers(playersData);
+			if (!recruitingClassesResponse.ok)
+				throw new Error('Failed to fetch recruiting classes');
+			const recruitingClasses = await recruitingClassesResponse.json();
+
+			if (recruitingClasses.length > 0) {
+				// Get the first (latest) recruiting class
+				const firstClass = recruitingClasses[0];
+				const playersResponse = await fetch(
+					`http://localhost:8000/players/class/${firstClass.id}/?sort_by=${sortField}&sort_order=${sortOrder}`
+				);
+				if (!playersResponse.ok) throw new Error('Failed to fetch players');
+				const playersData = await playersResponse.json();
+				setPlayers(playersData.players || []);
+			} else {
+				setPlayers([]);
+			}
 
 			setLoading(false);
 		} catch (err) {
