@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 
 interface Player {
 	id: number;
@@ -118,58 +119,19 @@ export default function Home() {
 	return (
 		<div className='min-h-screen p-8 bg-gray-50'>
 			<div className='max-w-7xl mx-auto'>
-				<h1 className='text-4xl font-bold mb-8 text-gray-900'>
-					NCAA Basketball Simulation
-				</h1>
-
-				{/* Leagues Section */}
-				<section className='mb-12'>
-					<h2 className='text-2xl font-semibold mb-4 text-gray-800'>
-						Leagues & Teams
-					</h2>
-					{leagues.length === 0 ? (
-						<p className='text-gray-600'>
-							No leagues found. Create a league to get started!
-						</p>
-					) : (
-						<div className='space-y-6'>
-							{leagues.map((league) => (
-								<div
-									key={league.id}
-									className='bg-white rounded-lg shadow-md p-6'>
-									<h3 className='text-xl font-semibold mb-4 text-blue-600'>
-										{league.name}
-									</h3>
-									{league.teams.length === 0 ? (
-										<p className='text-gray-500'>
-											No teams in this league yet.
-										</p>
-									) : (
-										<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
-											{league.teams.map((team) => (
-												<div
-													key={team.id}
-													className='border border-gray-200 rounded-lg p-4 hover:border-blue-400 transition'>
-													<div className='flex justify-between items-center mb-2'>
-														<h4 className='font-semibold text-gray-900'>
-															{team.name}
-														</h4>
-														<span className='text-sm font-medium text-blue-600'>
-															OVR: {team.overall}
-														</span>
-													</div>
-													<p className='text-sm text-gray-600'>
-														{team.players.length} players
-													</p>
-												</div>
-											))}
-										</div>
-									)}
-								</div>
-							))}
-						</div>
-					)}
-				</section>
+				<div className='flex justify-between items-center mb-8'>
+					<h1 className='text-4xl font-bold text-gray-900'>
+						NCAA Basketball Simulation
+					</h1>
+					<nav className='flex space-x-4'>
+						<Link 
+							href='/map' 
+							className='px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors'
+						>
+							View Map
+						</Link>
+					</nav>
+				</div>
 
 				{/* Players Section */}
 				<section>
